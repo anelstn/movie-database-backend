@@ -3,6 +3,7 @@ package main
 import (
 	"backend/config"
 	"backend/handlers"
+	"backend/middlewares"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -10,24 +11,36 @@ import (
 
 func main() {
 	config.ConnectDatabase()
+
 	r := gin.Default()
 
-	r.GET("/movies", handlers.GetMovies)
-	r.POST("/movies", handlers.CreateMovie)
-	r.GET("/movies/:id", handlers.GetMovieByID)
-	r.PUT("/movies/:id", handlers.UpdateMovie)
-	r.DELETE("/movies/:id", handlers.DeleteMovie)
+	r.POST("/auth/register", handlers.Register)
+	r.POST("/auth/login", handlers.Login)
 
-	r.GET("/directors", handlers.GetDirectors)
-	r.POST("/directors", handlers.CreateDirector)
-	r.GET("/directors/:id", handlers.GetDirectorByID)
-	r.DELETE("/directors/:id", handlers.DeleteDirector)
+	protected := r.Group("/")
+	protected.Use(middlewares.AuthMiddleware())
+	{
+		protected.GET("/movies", handlers.GetMovies)
+		protected.POST("/movies", handlers.CreateMovie)
+		protected.GET("/movies/:id", handlers.GetMovieByID)
+		protected.PUT("/movies/:id", handlers.UpdateMovie)
+		protected.DELETE("/movies/:id", handlers.DeleteMovie)
 
-	r.GET("/genres", handlers.GetGenres)
-	r.POST("/genres", handlers.CreateGenre)
-	r.GET("/genres/:id", handlers.GetGenreByID)
-	r.DELETE("/genres/:id", handlers.DeleteGenre)
+		protected.GET("/directors", handlers.GetDirectors)
+		protected.POST("/directors", handlers.CreateDirector)
+		protected.GET("/directors/:id", handlers.GetDirectorByID)
+		protected.DELETE("/directors/:id", handlers.DeleteDirector)
 
-	log.Println("Movie Database API is running on http://localhost:8080")
+		protected.GET("/genres", handlers.GetGenres)
+		protected.POST("/genres", handlers.CreateGenre)
+		protected.GET("/genres/:id", handlers.GetGenreByID)
+		protected.DELETE("/genres/:id", handlers.DeleteGenre)
+	}
+
+	log.Println("Movie Database API with JWT Authentication")
+	log.Println("Server: http://localhost:8080")
+	log.Println("POST /auth/register")
+	log.Println("POST /auth/login")
+	log.Println("All other routes require JWT (Authorization: Bearer <token>)")
 	r.Run(":8080")
 }

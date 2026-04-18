@@ -41,6 +41,6 @@ func main() {
 	log.Println("Server: http://localhost:8080")
 	log.Println("POST /auth/register")
 	log.Println("POST /auth/login")
-	log.Println("All other routes require JWT (Authorization: Bearer <token>)")
+	log.Println("Protected routes require Bearer token")
 	r.Run(":8080")
 }

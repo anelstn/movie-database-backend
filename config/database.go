@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 
-	"backend/models"
-
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -16,6 +14,7 @@ var DB *gorm.DB
 
 func ConnectDatabase() {
 	_ = godotenv.Load()
+
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Almaty",
 		os.Getenv("DB_HOST"),
@@ -24,14 +23,12 @@ func ConnectDatabase() {
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
 	)
+
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
-	err = DB.AutoMigrate(&models.Director{}, &models.Genre{}, &models.Movie{}, &models.User{})
-	if err != nil {
-		log.Fatal("Failed to migrate database:", err)
-	}
-	log.Println("Connected to PostgreSQL and migrated successfully!")
+
+	log.Println("Connected to PostgreSQL successfully!")
 }

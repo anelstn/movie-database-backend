@@ -23,6 +23,7 @@ func main() {
 		protected.GET("/movies", handlers.GetMovies)
 		protected.POST("/movies", handlers.CreateMovie)
 		protected.GET("/movies/:id", handlers.GetMovieByID)
+		protected.GET("/movies/:id/details", handlers.GetMovieWithReviewSummary)
 		protected.PUT("/movies/:id", handlers.UpdateMovie)
 		protected.DELETE("/movies/:id", handlers.DeleteMovie)
 

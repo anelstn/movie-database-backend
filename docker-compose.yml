@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: movie-db
+    environment:
+      POSTGRES_DB: moviedb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: haikus51w
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations/000001_create_initial_tables.up.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d moviedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  review-service:
+    build:
+      context: .
+      dockerfile: review-service/Dockerfile
+    container_name: review-service
+    ports:
+      - "8081:8081"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movie-api
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASSWORD: haikus51w
+      DB_NAME: moviedb
+      REVIEW_SERVICE_URL: http://review-service:8081
+    depends_on:
+      db:
+        condition: service_healthy
+      review-service:
+        condition: service_started
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,9 @@
+.git
+.gitignore
+.idea
+.env
+tmp
+bin
+dist
+vendor
+*.log
